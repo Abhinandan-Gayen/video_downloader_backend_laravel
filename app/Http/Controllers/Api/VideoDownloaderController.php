@@ -15,8 +15,12 @@ class VideoDownloaderController extends Controller
 
         $url = $request->url;
 
-        
-        $command = "yt-dlp --js-runtimes node --no-warnings -j " . escapeshellarg($url);
+
+        $command = "yt-dlp \
+        --extractor-args 'youtube:player_client=android' \
+        --no-playlist \
+        --no-warnings \
+        -j " . escapeshellarg($url);
 
         $output = shell_exec($command);
 
