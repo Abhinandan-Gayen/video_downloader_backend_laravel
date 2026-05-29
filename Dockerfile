@@ -1,53 +1,30 @@
-# PHP + Apache base image
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-# System packages install
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    git \
     unzip \
-    zip \
+    git \
     curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
     libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl
+    zip
 
-# Apache rewrite enable
-RUN a2enmod rewrite
+# Install PHP extensions
+RUN docker-php-ext-install zip
 
-# Composer install
+# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Working directory
-WORKDIR /var/www/html
+# Set working directory
+WORKDIR /app
 
-# Project files copy
+# Copy files
 COPY . .
 
-# Laravel dependencies install
+# Install composer packages
 RUN composer install --no-dev --optimize-autoloader
 
-# Permissions
-RUN chown -R www-data:www-data /var/www/html/storage
-RUN chown -R www-data:www-data /var/www/html/bootstrap/cache
+# Expose Render port
+EXPOSE 10000
 
-# Apache config
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/sites-available/*.conf
-
-RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
-    /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
-
-# Laravel cache optimize
-RUN php artisan config:cache || true
-RUN php artisan route:cache || true
-RUN php artisan view:cache || true
-
-# Expose port
-EXPOSE 80
-
-# Start apache
-CMD ["apache2-foreground"]
+# Start Laravel server
+CMD php artisan serve --host=0.0.0.0 --port=10000
