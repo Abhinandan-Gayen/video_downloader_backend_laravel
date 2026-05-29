@@ -5,8 +5,13 @@ RUN apt-get update && apt-get install -y \
     unzip \
     git \
     curl \
-    libzip-dev \
-    zip
+    zip \
+    ffmpeg \
+    python3 \
+    python3-pip
+
+# Install yt-dlp
+RUN pip3 install yt-dlp
 
 # Install PHP extensions
 RUN docker-php-ext-install zip
@@ -14,17 +19,16 @@ RUN docker-php-ext-install zip
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /app
 
 # Copy files
 COPY . .
 
-# Install composer packages
+# Install Laravel packages
 RUN composer install --no-dev --optimize-autoloader
 
 # Expose Render port
 EXPOSE 10000
 
-# Start Laravel server
+# Start Laravel
 CMD php artisan serve --host=0.0.0.0 --port=10000
