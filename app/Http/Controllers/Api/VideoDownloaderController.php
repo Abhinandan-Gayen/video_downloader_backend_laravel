@@ -16,12 +16,17 @@ class VideoDownloaderController extends Controller
         $url = $request->url;
 
         $cookiePath = base_path('cookies.txt');
+        $cookiePath = base_path('cookies.txt');
+
         $command = "yt-dlp \
         --cookies " . escapeshellarg($cookiePath) . " \
-        --extractor-args 'youtube:player_client=android' \
+        --user-agent 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36' \
+        --extractor-args 'youtube:player_client=android,web' \
+        --no-check-certificates \
+        --geo-bypass \
         --no-playlist \
-        --no-warnings \
-        -j " . escapeshellarg($url);
+        --dump-single-json \
+        " . escapeshellarg($url);
 
         $output = shell_exec($command);
 

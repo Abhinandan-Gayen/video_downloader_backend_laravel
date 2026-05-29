@@ -9,8 +9,8 @@ RUN apt-get update && apt-get install -y \
     python3 \
     python3-pip
 
-# Install yt-dlp
-RUN python3 -m pip install yt-dlp --break-system-packages
+# Install latest yt-dlp
+RUN python3 -m pip install -U yt-dlp --break-system-packages
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
